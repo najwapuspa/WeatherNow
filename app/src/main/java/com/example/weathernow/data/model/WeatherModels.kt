@@ -15,6 +15,11 @@ enum class TemperatureUnit(val symbol: String, val title: String) {
     FAHRENHEIT("°F", "Fahrenheit (°F)")
 }
 
+enum class AppLanguage(val code: String, val title: String) {
+    INDONESIAN("id", "Bahasa Indonesia"),
+    ENGLISH("en", "English")
+}
+
 fun Double.toDisplayTemp(unit: TemperatureUnit): Int {
     return if (unit == TemperatureUnit.FAHRENHEIT) {
         ((this * 9.0 / 5.0) + 32.0).roundToInt()

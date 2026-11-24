@@ -10,37 +10,38 @@ import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.weathernow.R
 
 sealed class Screen(
     val route: String,
-    val title: String,
+    val titleRes: Int,
     val selectedIcon: ImageVector,
     val unselectedIcon: ImageVector
 ) {
     data object Home : Screen(
         route = "home",
-        title = "Beranda",
+        titleRes = R.string.nav_home,
         selectedIcon = Icons.Filled.Home,
         unselectedIcon = Icons.Outlined.Home
     )
 
     data object Forecast : Screen(
         route = "forecast",
-        title = "Prakiraan",
+        titleRes = R.string.nav_forecast,
         selectedIcon = Icons.Filled.CalendarMonth,
         unselectedIcon = Icons.Outlined.CalendarMonth
     )
 
     data object Favorites : Screen(
         route = "favorites",
-        title = "Kota Favorit",
+        titleRes = R.string.nav_favorites,
         selectedIcon = Icons.Filled.Favorite,
         unselectedIcon = Icons.Outlined.FavoriteBorder
     )
 
     data object Settings : Screen(
         route = "settings",
-        title = "Pengaturan",
+        titleRes = R.string.nav_settings,
         selectedIcon = Icons.Filled.Settings,
         unselectedIcon = Icons.Outlined.Settings
     )

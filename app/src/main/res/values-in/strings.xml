@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WeatherNow</string>
+    <string name="app_subtitle">Prakiraan Cuaca Terkini</string>
+    <string name="search_placeholder">Ketik nama kota (cth: Bandung)...</string>
+    <string name="search_button">Cari</string>
+    <string name="refresh_weather">Perbarui Data Cuaca</string>
+    <string name="feels_like_format">Terasa seperti %1$s</string>
+    <string name="humidity_title">Kelembapan</string>
+    <string name="wind_speed_title">Kec. Angin</string>
+    <string name="feels_like_title">Terasa</string>
+    <string name="humidity_high">Tinggi</string>
+    <string name="humidity_normal">Normal</string>
+    <string name="wind_strong">Kencang</string>
+    <string name="wind_calm">Tenang</string>
+    <string name="feels_like_subtitle">Suhu persepsi</string>
+    <string name="forecast_7days_title">Prakiraan Cuaca 7 Hari</string>
+    <string name="attribution_open_meteo">Data cuaca disediakan secara langsung oleh Open-Meteo API</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Beranda</string>
+    <string name="nav_forecast">Prakiraan</string>
+    <string name="nav_favorites">Kota Favorit</string>
+    <string name="nav_settings">Pengaturan</string>
+
+    <!-- Forecast Screen -->
+    <string name="forecast_title">Prakiraan Cuaca</string>
+    <string name="hourly_24h_title">Prakiraan 24 Jam ke Depan</string>
+    <string name="select_day_prompt">Pilih Hari untuk Melihat Detail</string>
+    <string name="today">Hari Ini</string>
+    <string name="tomorrow">Besok</string>
+    <string name="now">Sekarang</string>
+    <string name="max_temp">Maksimum</string>
+    <string name="min_temp">Minimum</string>
+    <string name="days_7">7 Hari</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Kota Favorit</string>
+    <string name="favorites_count_format">%1$d kota tersimpan</string>
+    <string name="favorites_tap_hint">Ketuk kota untuk melihat cuaca lengkap di Beranda</string>
+    <string name="empty_favorites_title">Belum Ada Kota Favorit</string>
+    <string name="empty_favorites_desc">Simpan kota favorit Anda dengan mengetuk ikon hati di kartu cuaca Beranda untuk akses cepat.</string>
+    <string name="back_to_home">Kembali ke Beranda</string>
+    <string name="add_to_favorites">Tambah ke Favorit</string>
+    <string name="remove_from_favorites">Hapus dari Favorit</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_subtitle">Sesuaikan tampilan dan preferensi aplikasi</string>
+    <string name="section_theme">Tampilan Tema</string>
+    <string name="section_unit">Satuan Suhu</string>
+    <string name="section_language">Bahasa Aplikasi</string>
+    <string name="section_app_info">Informasi Aplikasi</string>
+
+    <string name="theme_light">Light Mode</string>
+    <string name="theme_light_desc">Tampilan terang dan bersih</string>
+    <string name="theme_dark">Dark Mode</string>
+    <string name="theme_dark_desc">Tampilan navy gelap yang nyaman di mata</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_system_desc">Mengikuti pengaturan tema sistem Android</string>
+
+    <string name="lang_indonesian">Bahasa Indonesia</string>
+    <string name="lang_indonesian_desc">Bahasa Indonesia</string>
+    <string name="lang_english">English</string>
+    <string name="lang_english_desc">Bahasa Inggris</string>
+
+    <string name="app_version">Versi 1.0 (Build PJBL)</string>
+    <string name="app_description">Aplikasi prakiraan cuaca modern multi-page berbasis Jetpack Compose dan Material 3 dengan integrasi API real-time Open-Meteo.</string>
+    <string name="data_source_title">Sumber Data: Open-Meteo API</string>
+    <string name="data_source_desc">Prakiraan akurat tanpa API key (Lisensi Non-Komersial)</string>
+    <string name="internet_note">Aplikasi membutuhkan koneksi internet untuk memperbarui data cuaca.</string>
+
+    <!-- Loading & Error -->
+    <string name="loading_message">Memuat data cuaca...</string>
+    <string name="fetching_forecast_format">Mengambil prakiraan cuaca untuk %1$s...</string>
+    <string name="fetching_open_meteo">Mengambil data real-time dari Open-Meteo...</string>
+    <string name="error_title">Gagal Memuat Informasi Cuaca</string>
+    <string name="retry_button">Coba Lagi</string>
+    <string name="search_error_empty">Silakan masukkan nama kota terlebih dahulu.</string>
+    <string name="search_error_not_found">Kota \"%1$s\" tidak ditemukan. Coba nama kota lain.</string>
+    <string name="error_no_internet">Koneksi internet terputus. Pastikan perangkat Anda terhubung ke internet.</string>
+    <string name="error_timeout">Koneksi ke server timeout. Silakan coba kembali.</string>
+    <string name="error_network">Terjadi masalah jaringan: Tidak dapat menghubungi server Open-Meteo.</string>
+    <string name="error_server">Server mengembalikan respons kesalahan (%1$d). Silakan coba sesaat lagi.</string>
+    <string name="error_unexpected">Terjadi kesalahan yang tidak terduga. Silakan coba lagi.</string>
+</resources>

@@ -2,6 +2,7 @@ package com.example.weathernow.ui.navigation
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -12,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,6 +26,7 @@ fun WeatherBottomBar(
 ) {
     NavigationBar(
         modifier = modifier
+            .height(72.dp)
             .shadow(elevation = 12.dp),
         containerColor = MaterialTheme.colorScheme.surface,
         tonalElevation = 6.dp
@@ -36,21 +39,25 @@ fun WeatherBottomBar(
                 label = "iconColor"
             )
 
+            val title = stringResource(screen.titleRes)
+
             NavigationBarItem(
                 selected = isSelected,
                 onClick = {
-                    onNavigateToRoute(screen.route)
+                    if (currentRoute != screen.route) {
+                        onNavigateToRoute(screen.route)
+                    }
                 },
                 icon = {
                     Icon(
                         imageVector = if (isSelected) screen.selectedIcon else screen.unselectedIcon,
-                        contentDescription = screen.title,
+                        contentDescription = title,
                         tint = iconColor
                     )
                 },
                 label = {
                     Text(
-                        text = screen.title,
+                        text = title,
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontSize = 11.sp,
                             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium

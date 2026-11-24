@@ -35,9 +35,11 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weathernow.R
 import com.example.weathernow.data.model.TemperatureUnit
 import com.example.weathernow.data.model.WeatherDashboardData
 import com.example.weathernow.data.model.toDisplayTemp
@@ -52,9 +54,9 @@ fun WeatherHeroCard(
     modifier: Modifier = Modifier
 ) {
     val gradientColors = listOf(
-        Color(0xFF247BA0), // Primary Blue
-        Color(0xFF185A7E), // Medium Navy-Blue
-        Color(0xFF102A43)  // Deep Navy
+        Color(0xFF247BA0),
+        Color(0xFF185A7E),
+        Color(0xFF102A43)
     )
     val weatherIcon = WeatherCodeHelper.getIcon(data.current.weatherCode)
     val displayTemp = data.current.temperature.toDisplayTemp(temperatureUnit)
@@ -100,7 +102,7 @@ fun WeatherHeroCard(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
-                                contentDescription = "Lokasi",
+                                contentDescription = null,
                                 tint = Color.White.copy(alpha = 0.95f),
                                 modifier = Modifier.size(22.dp)
                             )
@@ -135,7 +137,11 @@ fun WeatherHeroCard(
                             IconButton(onClick = onToggleFavorite) {
                                 Icon(
                                     imageVector = if (data.isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
-                                    contentDescription = if (data.isFavorite) "Hapus dari Favorit" else "Tambah ke Favorit",
+                                    contentDescription = if (data.isFavorite) {
+                                        stringResource(R.string.remove_from_favorites)
+                                    } else {
+                                        stringResource(R.string.add_to_favorites)
+                                    },
                                     tint = favoriteColor,
                                     modifier = Modifier.size(20.dp)
                                 )
@@ -225,7 +231,10 @@ fun WeatherHeroCard(
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
-                                text = "Terasa seperti $displayFeelsLike${temperatureUnit.symbol}",
+                                text = stringResource(
+                                    R.string.feels_like_format,
+                                    "$displayFeelsLike${temperatureUnit.symbol}"
+                                ),
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.Medium
                                 ),

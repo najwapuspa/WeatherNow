@@ -39,11 +39,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weathernow.R
 import com.example.weathernow.data.model.TemperatureUnit
 import com.example.weathernow.data.model.WeatherDashboardData
 import com.example.weathernow.ui.components.CitySearchBar
@@ -118,7 +120,7 @@ fun HomeScreen(
 
             // Footer Open-Meteo Attribution
             Text(
-                text = "Data cuaca disediakan secara langsung oleh Open-Meteo API",
+                text = stringResource(R.string.attribution_open_meteo),
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center,
@@ -152,7 +154,7 @@ fun HomeTopBar(
             ) {
                 Icon(
                     imageVector = Icons.Default.Cloud,
-                    contentDescription = "WeatherNow Icon",
+                    contentDescription = stringResource(R.string.app_name),
                     tint = Color.White,
                     modifier = Modifier.size(24.dp)
                 )
@@ -160,7 +162,7 @@ fun HomeTopBar(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "WeatherNow",
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp,
@@ -169,7 +171,7 @@ fun HomeTopBar(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "Prakiraan Cuaca Terkini",
+                    text = stringResource(R.string.app_subtitle),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -186,7 +188,7 @@ fun HomeTopBar(
         ) {
             Icon(
                 imageVector = Icons.Default.Refresh,
-                contentDescription = "Perbarui Data Cuaca"
+                contentDescription = stringResource(R.string.refresh_weather)
             )
         }
     }
@@ -256,7 +258,7 @@ fun WeatherLoadingView(
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "Mengambil data real-time dari Open-Meteo...",
+                text = stringResource(R.string.fetching_open_meteo),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center
@@ -295,7 +297,7 @@ fun WeatherErrorView(
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = Icons.Default.WarningAmber,
-                        contentDescription = "Peringatan",
+                        contentDescription = stringResource(R.string.error_title),
                         tint = MaterialTheme.colorScheme.error,
                         modifier = Modifier.size(32.dp)
                     )
@@ -305,7 +307,7 @@ fun WeatherErrorView(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Gagal Memuat Informasi Cuaca",
+                text = stringResource(R.string.error_title),
                 style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -337,7 +339,7 @@ fun WeatherErrorView(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Coba Lagi",
+                        text = stringResource(R.string.retry_button),
                         style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                     )
                 }

@@ -26,9 +26,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.weathernow.R
 import com.example.weathernow.data.model.CurrentWeather
 import com.example.weathernow.data.model.TemperatureUnit
 import com.example.weathernow.data.model.toDisplayTemp
@@ -42,15 +44,32 @@ fun WeatherMetricsRow(
 ) {
     val displayFeelsLike = current.feelsLike.toDisplayTemp(temperatureUnit)
 
+    val humidityTitle = stringResource(R.string.humidity_title)
+    val humiditySubtitle = if (current.humidity > 70) {
+        stringResource(R.string.humidity_high)
+    } else {
+        stringResource(R.string.humidity_normal)
+    }
+
+    val windTitle = stringResource(R.string.wind_speed_title)
+    val windSubtitle = if (current.windSpeed > 20) {
+        stringResource(R.string.wind_strong)
+    } else {
+        stringResource(R.string.wind_calm)
+    }
+
+    val feelsLikeTitle = stringResource(R.string.feels_like_title)
+    val feelsLikeSubtitle = stringResource(R.string.feels_like_subtitle)
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         // Humidity
         WeatherMetricCard(
-            title = "Kelembapan",
+            title = humidityTitle,
             value = "${current.humidity}%",
-            subtitle = if (current.humidity > 70) "Tinggi" else "Normal",
+            subtitle = humiditySubtitle,
             icon = Icons.Default.WaterDrop,
             accentColor = Color(0xFF247BA0),
             modifier = Modifier.weight(1f)
@@ -58,9 +77,9 @@ fun WeatherMetricsRow(
 
         // Wind Speed
         WeatherMetricCard(
-            title = "Kec. Angin",
+            title = windTitle,
             value = "${current.windSpeed.roundToInt()} km/j",
-            subtitle = if (current.windSpeed > 20) "Kencang" else "Tenang",
+            subtitle = windSubtitle,
             icon = Icons.Default.Air,
             accentColor = Color(0xFF00A8E8),
             modifier = Modifier.weight(1f)
@@ -68,9 +87,9 @@ fun WeatherMetricsRow(
 
         // Feels Like
         WeatherMetricCard(
-            title = "Terasa",
+            title = feelsLikeTitle,
             value = "$displayFeelsLike${temperatureUnit.symbol}",
-            subtitle = "Suhu persepsi",
+            subtitle = feelsLikeSubtitle,
             icon = Icons.Default.Thermostat,
             accentColor = Color(0xFFE65100),
             modifier = Modifier.weight(1f)

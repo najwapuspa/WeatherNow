@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.example.weathernow.data.model.AppLanguage
 import com.example.weathernow.data.model.CityLocation
 import com.example.weathernow.data.model.TemperatureUnit
 import com.example.weathernow.data.model.ThemeMode
@@ -23,6 +24,7 @@ class PreferencesManager(private val context: Context) {
     companion object {
         val KEY_THEME_MODE = stringPreferencesKey("theme_mode")
         val KEY_TEMP_UNIT = stringPreferencesKey("temp_unit")
+        val KEY_APP_LANGUAGE = stringPreferencesKey("app_language")
         val KEY_FAVORITE_CITIES = stringPreferencesKey("favorite_cities")
     }
 
@@ -41,6 +43,15 @@ class PreferencesManager(private val context: Context) {
             TemperatureUnit.valueOf(unitName)
         } catch (_: Exception) {
             TemperatureUnit.CELSIUS
+        }
+    }
+
+    val languageFlow: Flow<AppLanguage> = context.dataStore.data.map { preferences ->
+        val langName = preferences[KEY_APP_LANGUAGE] ?: AppLanguage.INDONESIAN.name
+        try {
+            AppLanguage.valueOf(langName)
+        } catch (_: Exception) {
+            AppLanguage.INDONESIAN
         }
     }
 
@@ -70,6 +81,12 @@ class PreferencesManager(private val context: Context) {
         }
     }
 
+    suspend fun setLanguage(language: AppLanguage) {
+        context.dataStore.edit { preferences ->
+            preferences[KEY_APP_LANGUAGE] = language.name
+        }
+    }
+
     suspend fun addFavoriteCity(city: CityLocation) {
         context.dataStore.edit { preferences ->
             val json = preferences[KEY_FAVORITE_CITIES]
@@ -84,7 +101,6 @@ class PreferencesManager(private val context: Context) {
                 }
             }
 
-            // Prevent duplicates by ID or identical coordinates
             val alreadyExists = currentList.any { it.id == city.id || (it.name == city.name && it.country == city.country) }
             if (!alreadyExists) {
                 currentList.add(city)

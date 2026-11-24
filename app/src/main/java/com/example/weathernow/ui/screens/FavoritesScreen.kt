@@ -40,11 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weathernow.R
 import com.example.weathernow.data.model.CityLocation
 import com.example.weathernow.data.model.FavoriteCityWeather
 import com.example.weathernow.data.model.TemperatureUnit
@@ -88,7 +90,7 @@ fun FavoritesScreen(
                 item {
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
-                        text = "Ketuk kota untuk melihat cuaca lengkap di Beranda",
+                        text = stringResource(R.string.favorites_tap_hint),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -134,14 +136,14 @@ fun FavoritesTopBar(
             IconButton(onClick = onBackToHome) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Kembali ke Beranda",
+                    contentDescription = stringResource(R.string.back_to_home),
                     tint = MaterialTheme.colorScheme.onBackground
                 )
             }
             Spacer(modifier = Modifier.width(4.dp))
             Column {
                 Text(
-                    text = "Kota Favorit",
+                    text = stringResource(R.string.favorites_title),
                     style = MaterialTheme.typography.titleLarge.copy(
                         fontWeight = FontWeight.ExtraBold,
                         fontSize = 22.sp
@@ -149,7 +151,7 @@ fun FavoritesTopBar(
                     color = MaterialTheme.colorScheme.onBackground
                 )
                 Text(
-                    text = "$count kota tersimpan",
+                    text = stringResource(R.string.favorites_count_format, count),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -279,7 +281,7 @@ fun FavoriteCityCard(
             ) {
                 Icon(
                     imageVector = Icons.Default.DeleteOutline,
-                    contentDescription = "Hapus dari Favorit",
+                    contentDescription = stringResource(R.string.remove_from_favorites),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
                     modifier = Modifier.size(22.dp)
                 )
@@ -317,7 +319,7 @@ fun EmptyFavoritesView(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "Belum Ada Kota Favorit",
+            text = stringResource(R.string.empty_favorites_title),
             style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold),
             color = MaterialTheme.colorScheme.onSurface
         )
@@ -325,7 +327,7 @@ fun EmptyFavoritesView(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Simpan kota favorit Anda dengan mengetuk ikon hati di kartu cuaca Beranda untuk akses cepat.",
+            text = stringResource(R.string.empty_favorites_desc),
             style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
@@ -348,7 +350,7 @@ fun EmptyFavoritesView(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Kembali ke Beranda",
+                text = stringResource(R.string.back_to_home),
                 style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
             )
         }

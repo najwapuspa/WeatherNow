@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weathernow.data.local.PreferencesManager
+import com.example.weathernow.data.model.AppLanguage
 import com.example.weathernow.data.model.CityLocation
 import com.example.weathernow.data.model.FavoriteCityWeather
 import com.example.weathernow.data.model.TemperatureUnit
@@ -41,7 +42,7 @@ class WeatherViewModel @JvmOverloads constructor(
     private val preferencesManager: PreferencesManager = PreferencesManager(application)
 ) : AndroidViewModel(application) {
 
-    // --- Theme & Unit Preferences State ---
+    // --- Theme, Unit & Language Preferences State ---
     val themeMode: StateFlow<ThemeMode> = preferencesManager.themeModeFlow.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -52,6 +53,12 @@ class WeatherViewModel @JvmOverloads constructor(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = TemperatureUnit.CELSIUS
+    )
+
+    val appLanguage: StateFlow<AppLanguage> = preferencesManager.languageFlow.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = AppLanguage.INDONESIAN
     )
 
     // --- Weather Dashboard UI State ---
@@ -71,14 +78,24 @@ class WeatherViewModel @JvmOverloads constructor(
 
     private var currentCity: CityLocation = WeatherRepository.DEFAULT_CITY
     private var favoriteCitiesList: List<CityLocation> = emptyList()
+    private var currentLanguage: AppLanguage = AppLanguage.INDONESIAN
 
     init {
+        // Observe language changes
+        viewModelScope.launch {
+            preferencesManager.languageFlow.collect { lang ->
+                currentLanguage = lang
+                // Refresh weather with new language descriptions and date format
+                loadWeather(currentCity)
+                updateFavoriteWeatherList(favoriteCitiesList)
+            }
+        }
+
         // Observe favorite cities from DataStore
         viewModelScope.launch {
             preferencesManager.favoriteCitiesFlow.collect { cities ->
                 favoriteCitiesList = cities
                 updateFavoriteWeatherList(cities)
-                // If current data is Success, sync its isFavorite flag
                 val current = _uiState.value
                 if (current is WeatherUiState.Success) {
                     val isFav = cities.any { it.id == current.data.city.id }
@@ -96,16 +113,22 @@ class WeatherViewModel @JvmOverloads constructor(
         currentCity = city
         _selectedForecastDayIndex.value = 0
         viewModelScope.launch {
-            _uiState.value = WeatherUiState.Loading("Mengambil prakiraan cuaca untuk ${city.name}...")
+            val loadingMsg = if (currentLanguage == AppLanguage.INDONESIAN) {
+                "Mengambil prakiraan cuaca untuk ${city.name}..."
+            } else {
+                "Fetching weather forecast for ${city.name}..."
+            }
+            _uiState.value = WeatherUiState.Loading(loadingMsg)
+
             val isFav = favoriteCitiesList.any { it.id == city.id }
-            val result = repository.getWeather(city, isFavorite = isFav)
+            val result = repository.getWeather(city, isFavorite = isFav, language = currentLanguage)
             result.fold(
                 onSuccess = { data ->
                     _uiState.value = WeatherUiState.Success(data)
                 },
                 onFailure = { error ->
                     _uiState.value = WeatherUiState.Error(
-                        message = parseErrorMessage(error)
+                        message = parseErrorMessage(error, currentLanguage)
                     )
                 }
             )
@@ -133,8 +156,13 @@ class WeatherViewModel @JvmOverloads constructor(
     fun searchCity() {
         val query = _searchState.value.query.trim()
         if (query.isEmpty()) {
+            val emptyMsg = if (currentLanguage == AppLanguage.INDONESIAN) {
+                "Silakan masukkan nama kota terlebih dahulu."
+            } else {
+                "Please enter a city name first."
+            }
             _searchState.value = _searchState.value.copy(
-                searchError = "Silakan masukkan nama kota terlebih dahulu."
+                searchError = emptyMsg
             )
             return
         }
@@ -145,14 +173,19 @@ class WeatherViewModel @JvmOverloads constructor(
                 searchError = null
             )
 
-            val result = repository.searchCities(query)
+            val result = repository.searchCities(query, language = currentLanguage)
             result.fold(
                 onSuccess = { cities ->
                     if (cities.isEmpty()) {
+                        val notFoundMsg = if (currentLanguage == AppLanguage.INDONESIAN) {
+                            "Kota \"$query\" tidak ditemukan. Coba nama kota lain."
+                        } else {
+                            "City \"$query\" not found. Try another city name."
+                        }
                         _searchState.value = _searchState.value.copy(
                             isSearching = false,
                             results = emptyList(),
-                            searchError = "Kota \"$query\" tidak ditemukan. Coba nama kota lain.",
+                            searchError = notFoundMsg,
                             isDropdownOpen = false
                         )
                     } else {
@@ -168,7 +201,7 @@ class WeatherViewModel @JvmOverloads constructor(
                     _searchState.value = _searchState.value.copy(
                         isSearching = false,
                         results = emptyList(),
-                        searchError = parseErrorMessage(error),
+                        searchError = parseErrorMessage(error, currentLanguage),
                         isDropdownOpen = false
                     )
                 }
@@ -220,7 +253,7 @@ class WeatherViewModel @JvmOverloads constructor(
             _favoriteCitiesWeather.value = items
 
             val updatedItems = cities.map { city ->
-                val weatherResult = repository.getWeather(city)
+                val weatherResult = repository.getWeather(city, language = currentLanguage)
                 weatherResult.fold(
                     onSuccess = { data ->
                         FavoriteCityWeather(
@@ -256,13 +289,29 @@ class WeatherViewModel @JvmOverloads constructor(
         }
     }
 
-    private fun parseErrorMessage(throwable: Throwable): String {
-        return when (throwable) {
-            is UnknownHostException -> "Koneksi internet terputus. Pastikan perangkat Anda terhubung ke internet."
-            is SocketTimeoutException -> "Koneksi ke server timeout. Silakan coba kembali."
-            is IOException -> "Terjadi masalah jaringan: Tidak dapat menghubungi server Open-Meteo."
-            is HttpException -> "Server mengembalikan respons kesalahan (${throwable.code()}). Silakan coba sesaat lagi."
-            else -> throwable.localizedMessage ?: "Terjadi kesalahan yang tidak terduga. Silakan coba lagi."
+    fun setLanguage(language: AppLanguage) {
+        viewModelScope.launch {
+            preferencesManager.setLanguage(language)
+        }
+    }
+
+    private fun parseErrorMessage(throwable: Throwable, language: AppLanguage): String {
+        return if (language == AppLanguage.INDONESIAN) {
+            when (throwable) {
+                is UnknownHostException -> "Koneksi internet terputus. Pastikan perangkat Anda terhubung ke internet."
+                is SocketTimeoutException -> "Koneksi ke server timeout. Silakan coba kembali."
+                is IOException -> "Terjadi masalah jaringan: Tidak dapat menghubungi server Open-Meteo."
+                is HttpException -> "Server mengembalikan respons kesalahan (${throwable.code()}). Silakan coba sesaat lagi."
+                else -> throwable.localizedMessage ?: "Terjadi kesalahan yang tidak terduga. Silakan coba lagi."
+            }
+        } else {
+            when (throwable) {
+                is UnknownHostException -> "Internet connection lost. Please make sure your device is connected to the internet."
+                is SocketTimeoutException -> "Connection to server timed out. Please try again."
+                is IOException -> "Network issue: Unable to reach Open-Meteo server."
+                is HttpException -> "Server returned error (${throwable.code()}). Please try again shortly."
+                else -> throwable.localizedMessage ?: "An unexpected error occurred. Please try again."
+            }
         }
     }
 }

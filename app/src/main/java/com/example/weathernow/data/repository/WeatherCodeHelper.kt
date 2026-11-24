@@ -11,35 +11,72 @@ import androidx.compose.material.icons.filled.WbCloudy
 import androidx.compose.material.icons.filled.WbSunny
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import com.example.weathernow.data.model.AppLanguage
 
 object WeatherCodeHelper {
 
-    fun getDescription(code: Int): String {
+    fun getDescription(code: Int, language: AppLanguage = AppLanguage.INDONESIAN): String {
+        return when (language) {
+            AppLanguage.INDONESIAN -> getIndonesianDescription(code)
+            AppLanguage.ENGLISH -> getEnglishDescription(code)
+        }
+    }
+
+    private fun getIndonesianDescription(code: Int): String {
         return when (code) {
-            0 -> "Cerah (Clear Sky)"
-            1 -> "Cerah Berawan (Mainly Clear)"
-            2 -> "Berawan Sebagian (Partly Cloudy)"
-            3 -> "Mendung (Overcast)"
-            45, 48 -> "Berkabut (Foggy)"
-            51 -> "Gerimis Ringan (Light Drizzle)"
-            53 -> "Gerimis Sedang (Moderate Drizzle)"
-            55 -> "Gerimis Lebat (Dense Drizzle)"
-            56, 57 -> "Gerimis Beku (Freezing Drizzle)"
-            61 -> "Hujan Ringan (Slight Rain)"
-            63 -> "Hujan Sedang (Moderate Rain)"
-            65 -> "Hujan Lebat (Heavy Rain)"
-            66, 67 -> "Hujan Beku (Freezing Rain)"
-            71 -> "Salju Ringan (Slight Snow)"
-            73 -> "Salju Sedang (Moderate Snow)"
-            75 -> "Salju Lebat (Heavy Snow)"
-            77 -> "Hujan Butir Es (Snow Grains)"
-            80 -> "Hujan Guyur Ringan (Light Showers)"
-            81 -> "Hujan Guyur Sedang (Moderate Showers)"
-            82 -> "Hujan Guyur Lebat (Violent Showers)"
-            85, 86 -> "Hujan Salju Guyur (Snow Showers)"
-            95 -> "Badai Petir (Thunderstorm)"
-            96, 99 -> "Badai Petir & Hujan Es (Severe Thunderstorm)"
+            0 -> "Cerah"
+            1 -> "Cerah Berawan"
+            2 -> "Berawan Sebagian"
+            3 -> "Mendung"
+            45, 48 -> "Berkabut"
+            51 -> "Gerimis Ringan"
+            53 -> "Gerimis Sedang"
+            55 -> "Gerimis Lebat"
+            56, 57 -> "Gerimis Beku"
+            61 -> "Hujan Ringan"
+            63 -> "Hujan Sedang"
+            65 -> "Hujan Lebat"
+            66, 67 -> "Hujan Beku"
+            71 -> "Salju Ringan"
+            73 -> "Salju Sedang"
+            75 -> "Salju Lebat"
+            77 -> "Hujan Butir Es"
+            80 -> "Hujan Guyur Ringan"
+            81 -> "Hujan Guyur Sedang"
+            82 -> "Hujan Guyur Lebat"
+            85, 86 -> "Hujan Salju Guyur"
+            95 -> "Badai Petir"
+            96, 99 -> "Badai Petir & Hujan Es"
             else -> "Cuaca Bervariasi"
+        }
+    }
+
+    private fun getEnglishDescription(code: Int): String {
+        return when (code) {
+            0 -> "Clear Sky"
+            1 -> "Mainly Clear"
+            2 -> "Partly Cloudy"
+            3 -> "Overcast"
+            45, 48 -> "Foggy"
+            51 -> "Light Drizzle"
+            53 -> "Moderate Drizzle"
+            55 -> "Dense Drizzle"
+            56, 57 -> "Freezing Drizzle"
+            61 -> "Slight Rain"
+            63 -> "Moderate Rain"
+            65 -> "Heavy Rain"
+            66, 67 -> "Freezing Rain"
+            71 -> "Slight Snow"
+            73 -> "Moderate Snow"
+            75 -> "Heavy Snow"
+            77 -> "Snow Grains"
+            80 -> "Light Showers"
+            81 -> "Moderate Showers"
+            82 -> "Violent Showers"
+            85, 86 -> "Snow Showers"
+            95 -> "Thunderstorm"
+            96, 99 -> "Severe Thunderstorm"
+            else -> "Variable Weather"
         }
     }
 
@@ -65,31 +102,26 @@ object WeatherCodeHelper {
 
     fun getGradientColors(code: Int): List<Color> {
         return when (code) {
-            // Cerah / Sunny (Blue to cyan/soft gold)
             0, 1 -> listOf(
-                Color(0xFF1E88E5), // Bright vibrant blue
-                Color(0xFF1565C0), // Deep blue
-                Color(0xFF0D47A1)  // Rich navy
+                Color(0xFF1E88E5),
+                Color(0xFF1565C0),
+                Color(0xFF0D47A1)
             )
-            // Berawan / Cloudy (Soft slate blue to navy)
             2, 3, 45, 48 -> listOf(
-                Color(0xFF37474F), // Slate blue grey
-                Color(0xFF263238), // Dark slate
-                Color(0xFF1A237E)  // Navy
+                Color(0xFF37474F),
+                Color(0xFF263238),
+                Color(0xFF1A237E)
             )
-            // Hujan / Rain (Teal blue to dark ocean)
             51, 53, 55, 61, 63, 65, 80, 81, 82 -> listOf(
-                Color(0xFF00695C), // Deep teal
-                Color(0xFF004D40), // Darker teal
-                Color(0xFF0A192F)  // Dark navy
+                Color(0xFF00695C),
+                Color(0xFF004D40),
+                Color(0xFF0A192F)
             )
-            // Badai Petir / Thunderstorm (Deep indigo to dark midnight navy)
             95, 96, 99 -> listOf(
-                Color(0xFF311B92), // Deep purple-navy
-                Color(0xFF1A237E), // Deep navy
-                Color(0xFF0D1B2A)  // Midnight blue
+                Color(0xFF311B92),
+                Color(0xFF1A237E),
+                Color(0xFF0D1B2A)
             )
-            // Salju / Beku / Default
             else -> listOf(
                 Color(0xFF1976D2),
                 Color(0xFF0D47A1),

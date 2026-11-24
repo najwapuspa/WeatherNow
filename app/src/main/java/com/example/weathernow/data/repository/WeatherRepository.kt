@@ -1,5 +1,6 @@
 package com.example.weathernow.data.repository
 
+import com.example.weathernow.data.model.AppLanguage
 import com.example.weathernow.data.model.CityLocation
 import com.example.weathernow.data.model.CurrentWeather
 import com.example.weathernow.data.model.DailyForecastItem
@@ -19,16 +20,17 @@ class WeatherRepository(
     private val weatherApi: WeatherApiService = RetrofitClient.weatherApi
 ) {
 
-    private val idLocale = Locale.forLanguageTag("id-ID")
-
-    suspend fun searchCities(query: String): Result<List<CityLocation>> = withContext(Dispatchers.IO) {
+    suspend fun searchCities(
+        query: String,
+        language: AppLanguage = AppLanguage.INDONESIAN
+    ): Result<List<CityLocation>> = withContext(Dispatchers.IO) {
         try {
             val trimmed = query.trim()
             if (trimmed.isEmpty()) {
                 return@withContext Result.success(emptyList())
             }
 
-            val response = geocodingApi.searchCity(name = trimmed, language = "id")
+            val response = geocodingApi.searchCity(name = trimmed, language = language.code)
             val items = response.results.orEmpty().map { item ->
                 CityLocation(
                     id = item.id,
@@ -47,7 +49,8 @@ class WeatherRepository(
 
     suspend fun getWeather(
         city: CityLocation,
-        isFavorite: Boolean = false
+        isFavorite: Boolean = false,
+        language: AppLanguage = AppLanguage.INDONESIAN
     ): Result<WeatherDashboardData> = withContext(Dispatchers.IO) {
         try {
             val response = weatherApi.getForecast(
@@ -64,9 +67,15 @@ class WeatherRepository(
                 humidity = currentDto.relativeHumidity2m,
                 windSpeed = currentDto.windSpeed10m,
                 weatherCode = currentDto.weatherCode,
-                conditionDescription = WeatherCodeHelper.getDescription(currentDto.weatherCode),
+                conditionDescription = WeatherCodeHelper.getDescription(currentDto.weatherCode, language),
                 time = currentDto.time
             )
+
+            val locale = if (language == AppLanguage.INDONESIAN) {
+                Locale.forLanguageTag("id-ID")
+            } else {
+                Locale.ENGLISH
+            }
 
             // --- Parse Daily Forecast ---
             val dailyDto = response.daily
@@ -74,8 +83,8 @@ class WeatherRepository(
 
             if (dailyDto != null && dailyDto.time.isNotEmpty()) {
                 val inputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                val dayFormat = SimpleDateFormat("EEEE", idLocale)
-                val dateFormat = SimpleDateFormat("d MMMM yyyy", idLocale)
+                val dayFormat = SimpleDateFormat("EEEE", locale)
+                val dateFormat = SimpleDateFormat("d MMMM yyyy", locale)
 
                 for (i in dailyDto.time.indices) {
                     val dateStr = dailyDto.time[i]
@@ -89,17 +98,25 @@ class WeatherRepository(
                         val parsedDate: Date? = inputFormat.parse(dateStr)
                         if (parsedDate != null) {
                             dayName = when (i) {
-                                0 -> "Hari Ini"
-                                1 -> "Besok"
+                                0 -> if (language == AppLanguage.INDONESIAN) "Hari Ini" else "Today"
+                                1 -> if (language == AppLanguage.INDONESIAN) "Besok" else "Tomorrow"
                                 else -> dayFormat.format(parsedDate)
                             }
                             formattedDate = dateFormat.format(parsedDate)
                         } else {
-                            dayName = if (i == 0) "Hari Ini" else "Hari ke-${i + 1}"
+                            dayName = if (i == 0) {
+                                if (language == AppLanguage.INDONESIAN) "Hari Ini" else "Today"
+                            } else {
+                                "Day ${i + 1}"
+                            }
                             formattedDate = dateStr
                         }
                     } catch (_: Exception) {
-                        dayName = if (i == 0) "Hari Ini" else "Hari ke-${i + 1}"
+                        dayName = if (i == 0) {
+                            if (language == AppLanguage.INDONESIAN) "Hari Ini" else "Today"
+                        } else {
+                            "Day ${i + 1}"
+                        }
                         formattedDate = dateStr
                     }
 
@@ -109,7 +126,7 @@ class WeatherRepository(
                             dayName = dayName,
                             formattedDate = formattedDate,
                             weatherCode = code,
-                            conditionDescription = WeatherCodeHelper.getDescription(code),
+                            conditionDescription = WeatherCodeHelper.getDescription(code, language),
                             tempMax = maxTemp,
                             tempMin = minTemp,
                             isToday = i == 0
@@ -124,10 +141,9 @@ class WeatherRepository(
 
             if (hourlyDto != null && hourlyDto.time.isNotEmpty()) {
                 val hourInputFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.getDefault())
-                val hourOutputFormat = SimpleDateFormat("HH:mm", idLocale)
+                val hourOutputFormat = SimpleDateFormat("HH:mm", locale)
                 val currentHourString = SimpleDateFormat("yyyy-MM-dd'T'HH", Locale.getDefault()).format(Date())
 
-                // Find index matching current hour or start from 0
                 var startIndex = 0
                 for (i in hourlyDto.time.indices) {
                     if (hourlyDto.time[i].startsWith(currentHourString)) {
@@ -136,6 +152,8 @@ class WeatherRepository(
                     }
                 }
 
+                val nowLabel = if (language == AppLanguage.INDONESIAN) "Sekarang" else "Now"
+
                 val endIndex = (startIndex + 24).coerceAtMost(hourlyDto.time.size)
                 for (i in startIndex until endIndex) {
                     val timeStr = hourlyDto.time[i]
@@ -143,7 +161,7 @@ class WeatherRepository(
                     val code = hourlyDto.weatherCode.getOrNull(i) ?: 0
 
                     val label = if (i == startIndex) {
-                        "Sekarang"
+                        nowLabel
                     } else {
                         try {
                             val parsed = hourInputFormat.parse(timeStr)
@@ -159,7 +177,7 @@ class WeatherRepository(
                             hourLabel = label,
                             temperature = temp,
                             weatherCode = code,
-                            conditionDescription = WeatherCodeHelper.getDescription(code),
+                            conditionDescription = WeatherCodeHelper.getDescription(code, language),
                             isNow = i == startIndex
                         )
                     )
@@ -167,11 +185,15 @@ class WeatherRepository(
             }
 
             val now = Date()
-            val fullDateFormat = SimpleDateFormat("EEEE, d MMMM yyyy", idLocale)
-            val timeFormat = SimpleDateFormat("HH:mm", idLocale)
+            val fullDateFormat = SimpleDateFormat("EEEE, d MMMM yyyy", locale)
+            val timeFormat = SimpleDateFormat("HH:mm", locale)
 
             val localFormattedDate = fullDateFormat.format(now)
-            val lastUpdatedTime = "${timeFormat.format(now)} WIB"
+            val lastUpdatedTime = if (language == AppLanguage.INDONESIAN) {
+                "${timeFormat.format(now)} WIB"
+            } else {
+                "${timeFormat.format(now)} (Local)"
+            }
 
             val dashboardData = WeatherDashboardData(
                 city = city,

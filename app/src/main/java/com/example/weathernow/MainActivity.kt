@@ -1,5 +1,6 @@
 package com.example.weathernow
 
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,8 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -18,6 +23,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.weathernow.data.model.AppLanguage
 import com.example.weathernow.ui.navigation.Screen
 import com.example.weathernow.ui.navigation.WeatherBottomBar
 import com.example.weathernow.ui.screens.FavoritesScreen
@@ -26,6 +32,7 @@ import com.example.weathernow.ui.screens.HomeScreen
 import com.example.weathernow.ui.screens.SettingsScreen
 import com.example.weathernow.ui.theme.WeatherNowTheme
 import com.example.weathernow.viewmodel.WeatherViewModel
+import java.util.Locale
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,9 +41,39 @@ class MainActivity : ComponentActivity() {
         setContent {
             val weatherViewModel: WeatherViewModel = viewModel()
             val themeMode by weatherViewModel.themeMode.collectAsStateWithLifecycle()
+            val appLanguage by weatherViewModel.appLanguage.collectAsStateWithLifecycle()
 
-            WeatherNowTheme(themeMode = themeMode) {
-                MainApp(viewModel = weatherViewModel)
+            val currentContext = LocalContext.current
+            val currentConfig = LocalConfiguration.current
+
+            val locale = if (appLanguage == AppLanguage.INDONESIAN) {
+                Locale.forLanguageTag("id-ID")
+            } else {
+                Locale.ENGLISH
+            }
+
+            val localizedConfiguration = remember(locale, currentConfig) {
+                Configuration(currentConfig).apply {
+                    setLocale(locale)
+                    setLayoutDirection(locale)
+                }
+            }
+
+            val localizedContext = remember(locale, currentContext) {
+                val config = Configuration(currentContext.resources.configuration).apply {
+                    setLocale(locale)
+                    setLayoutDirection(locale)
+                }
+                currentContext.createConfigurationContext(config)
+            }
+
+            CompositionLocalProvider(
+                LocalConfiguration provides localizedConfiguration,
+                LocalContext provides localizedContext
+            ) {
+                WeatherNowTheme(themeMode = themeMode) {
+                    MainApp(viewModel = weatherViewModel)
+                }
             }
         }
     }

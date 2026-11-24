@@ -1,5 +1,6 @@
 package com.example.weathernow
 
+import com.example.weathernow.data.model.AppLanguage
 import com.example.weathernow.data.model.CityLocation
 import com.example.weathernow.data.model.ForecastResponse
 import com.example.weathernow.data.model.GeocodingResponse
@@ -18,14 +19,33 @@ class WeatherModelsTest {
 
     @Test
     fun testWeatherCodeHelperDescriptions() {
-        val clearSky = WeatherCodeHelper.getDescription(0)
-        assertTrue(clearSky.contains("Cerah", ignoreCase = true))
+        // Indonesian (default)
+        val clearSkyId = WeatherCodeHelper.getDescription(0, AppLanguage.INDONESIAN)
+        assertEquals("Cerah", clearSkyId)
 
-        val rain = WeatherCodeHelper.getDescription(61)
-        assertTrue(rain.contains("Hujan", ignoreCase = true))
+        val rainId = WeatherCodeHelper.getDescription(61, AppLanguage.INDONESIAN)
+        assertEquals("Hujan Ringan", rainId)
 
-        val thunder = WeatherCodeHelper.getDescription(95)
-        assertTrue(thunder.contains("Badai", ignoreCase = true))
+        val thunderId = WeatherCodeHelper.getDescription(95, AppLanguage.INDONESIAN)
+        assertEquals("Badai Petir", thunderId)
+
+        // English
+        val clearSkyEn = WeatherCodeHelper.getDescription(0, AppLanguage.ENGLISH)
+        assertEquals("Clear Sky", clearSkyEn)
+
+        val rainEn = WeatherCodeHelper.getDescription(61, AppLanguage.ENGLISH)
+        assertEquals("Slight Rain", rainEn)
+
+        val thunderEn = WeatherCodeHelper.getDescription(95, AppLanguage.ENGLISH)
+        assertEquals("Thunderstorm", thunderEn)
+    }
+
+    @Test
+    fun testAppLanguageValues() {
+        assertEquals("id", AppLanguage.INDONESIAN.code)
+        assertEquals("en", AppLanguage.ENGLISH.code)
+        assertEquals("Bahasa Indonesia", AppLanguage.INDONESIAN.title)
+        assertEquals("English", AppLanguage.ENGLISH.title)
     }
 
     @Test

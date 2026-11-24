@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -40,11 +41,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import com.example.weathernow.R
 import com.example.weathernow.data.model.CityLocation
 import com.example.weathernow.viewmodel.SearchUiState
 
@@ -73,7 +76,7 @@ fun CitySearchBar(
                         .shadow(elevation = 3.dp, shape = RoundedCornerShape(18.dp)),
                     placeholder = {
                         Text(
-                            text = "Ketik nama kota (cth: Bandung)...",
+                            text = stringResource(R.string.search_placeholder),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -81,7 +84,7 @@ fun CitySearchBar(
                     leadingIcon = {
                         Icon(
                             imageVector = Icons.Default.Search,
-                            contentDescription = "Cari",
+                            contentDescription = stringResource(R.string.search_button),
                             tint = MaterialTheme.colorScheme.primary
                         )
                     },
@@ -99,7 +102,7 @@ fun CitySearchBar(
                                 IconButton(onClick = { onQueryChange("") }) {
                                     Icon(
                                         imageVector = Icons.Default.Clear,
-                                        contentDescription = "Hapus teks",
+                                        contentDescription = "Clear",
                                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                 }
@@ -123,17 +126,18 @@ fun CitySearchBar(
                     )
                 )
 
-                // Search Results Dropdown Popup
+                // Search Results Dropdown Popup with Landscape & IME awareness
                 if (searchState.isDropdownOpen && searchState.results.isNotEmpty()) {
                     Popup(
                         alignment = Alignment.TopStart,
                         onDismissRequest = onDismissDropdown,
-                        properties = PopupProperties(focusable = false)
+                        properties = PopupProperties(focusable = false, dismissOnClickOutside = true)
                     ) {
                         Card(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(top = 60.dp, start = 4.dp, end = 4.dp)
+                                .imePadding()
                                 .shadow(8.dp, RoundedCornerShape(16.dp)),
                             shape = RoundedCornerShape(16.dp),
                             colors = CardDefaults.cardColors(
@@ -143,7 +147,7 @@ fun CitySearchBar(
                             LazyColumn(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .heightIn(max = 240.dp)
+                                    .heightIn(max = 220.dp)
                             ) {
                                 items(searchState.results, key = { it.id }) { city ->
                                     CitySearchItem(
@@ -180,7 +184,7 @@ fun CitySearchBar(
                     .padding(vertical = 2.dp)
             ) {
                 Text(
-                    text = "Cari",
+                    text = stringResource(R.string.search_button),
                     style = MaterialTheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold)
                 )
             }

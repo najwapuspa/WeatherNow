@@ -1,3 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WeatherNow</string>
+    <string name="app_subtitle">Latest Weather Forecast</string>
+    <string name="search_placeholder">Type city name (e.g. Bandung)...</string>
+    <string name="search_button">Search</string>
+    <string name="refresh_weather">Refresh Weather</string>
+    <string name="feels_like_format">Feels like %1$s</string>
+    <string name="humidity_title">Humidity</string>
+    <string name="wind_speed_title">Wind Speed</string>
+    <string name="feels_like_title">Feels Like</string>
+    <string name="humidity_high">High</string>
+    <string name="humidity_normal">Normal</string>
+    <string name="wind_strong">Strong</string>
+    <string name="wind_calm">Calm</string>
+    <string name="feels_like_subtitle">Perceived temperature</string>
+    <string name="forecast_7days_title">7-Day Weather Forecast</string>
+    <string name="attribution_open_meteo">Weather data provided live by Open-Meteo API</string>
+
+    <!-- Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_forecast">Forecast</string>
+    <string name="nav_favorites">Favorite Cities</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Forecast Screen -->
+    <string name="forecast_title">Weather Forecast</string>
+    <string name="hourly_24h_title">Next 24-Hour Forecast</string>
+    <string name="select_day_prompt">Select Day to View Details</string>
+    <string name="today">Today</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="now">Now</string>
+    <string name="max_temp">Maximum</string>
+    <string name="min_temp">Minimum</string>
+    <string name="days_7">7 Days</string>
+
+    <!-- Favorites Screen -->
+    <string name="favorites_title">Favorite Cities</string>
+    <string name="favorites_count_format">%1$d cities saved</string>
+    <string name="favorites_tap_hint">Tap a city to view full weather on Home</string>
+    <string name="empty_favorites_title">No Favorite Cities Yet</string>
+    <string name="empty_favorites_desc">Save your favorite cities by tapping the heart icon on the Home weather card for quick access.</string>
+    <string name="back_to_home">Return to Home</string>
+    <string name="add_to_favorites">Add to Favorites</string>
+    <string name="remove_from_favorites">Remove from Favorites</string>
+
+    <!-- Settings Screen -->
+    <string name="settings_title">Settings</string>
+    <string name="settings_subtitle">Customize app appearance and preferences</string>
+    <string name="section_theme">Theme Mode</string>
+    <string name="section_unit">Temperature Unit</string>
+    <string name="section_language">App Language</string>
+    <string name="section_app_info">Application Info</string>
+
+    <string name="theme_light">Light Mode</string>
+    <string name="theme_light_desc">Bright and clean appearance</string>
+    <string name="theme_dark">Dark Mode</string>
+    <string name="theme_dark_desc">Dark navy appearance easy on the eyes</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_system_desc">Follow Android system theme settings</string>
+
+    <string name="lang_indonesian">Bahasa Indonesia</string>
+    <string name="lang_indonesian_desc">Indonesian Language</string>
+    <string name="lang_english">English</string>
+    <string name="lang_english_desc">English Language</string>
+
+    <string name="app_version">Version 1.0 (Build PJBL)</string>
+    <string name="app_description">Modern multi-page weather forecast app built with Jetpack Compose and Material 3 integrated with real-time Open-Meteo API.</string>
+    <string name="data_source_title">Data Source: Open-Meteo API</string>
+    <string name="data_source_desc">Accurate forecast without API key (Non-Commercial License)</string>
+    <string name="internet_note">App requires internet connection to update weather data.</string>
+
+    <!-- Loading & Error -->
+    <string name="loading_message">Loading weather data...</string>
+    <string name="fetching_forecast_format">Fetching weather forecast for %1$s...</string>
+    <string name="fetching_open_meteo">Fetching real-time data from Open-Meteo...</string>
+    <string name="error_title">Failed to Load Weather Info</string>
+    <string name="retry_button">Try Again</string>
+    <string name="search_error_empty">Please enter a city name first.</string>
+    <string name="search_error_not_found">City \"%1$s\" not found. Try another city name.</string>
+    <string name="error_no_internet">Internet connection lost. Please make sure your device is connected to the internet.</string>
+    <string name="error_timeout">Connection to server timed out. Please try again.</string>
+    <string name="error_network">Network issue: Unable to reach Open-Meteo server.</string>
+    <string name="error_server">Server returned error (%1$d). Please try again shortly.</string>
+    <string name="error_unexpected">An unexpected error occurred. Please try again.</string>
 </resources>

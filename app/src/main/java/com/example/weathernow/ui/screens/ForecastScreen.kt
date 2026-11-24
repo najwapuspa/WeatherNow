@@ -45,10 +45,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weathernow.R
 import com.example.weathernow.data.model.DailyForecastItem
 import com.example.weathernow.data.model.HourlyForecastItem
 import com.example.weathernow.data.model.TemperatureUnit
@@ -129,7 +131,7 @@ fun ForecastTopBar(
     ) {
         Column {
             Text(
-                text = "Prakiraan Cuaca",
+                text = stringResource(R.string.forecast_title),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 22.sp
@@ -171,7 +173,7 @@ fun ForecastTopBar(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "7 Hari",
+                    text = stringResource(R.string.days_7),
                     style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.Bold),
                     color = MaterialTheme.colorScheme.primary
                 )
@@ -210,7 +212,7 @@ fun ForecastContent(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Prakiraan 24 Jam ke Depan",
+                    text = stringResource(R.string.hourly_24h_title),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = 17.sp
@@ -260,7 +262,7 @@ fun ForecastContent(
             )
             Spacer(modifier = Modifier.width(8.dp))
             Text(
-                text = "Pilih Hari untuk Melihat Detail",
+                text = stringResource(R.string.select_day_prompt),
                 style = MaterialTheme.typography.titleMedium.copy(
                     fontWeight = FontWeight.Bold,
                     fontSize = 17.sp
@@ -386,7 +388,7 @@ fun SelectedDayDetailCard(
                                 shape = RoundedCornerShape(8.dp)
                             ) {
                                 Text(
-                                    text = "Hari Ini",
+                                    text = stringResource(R.string.today),
                                     style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.Bold),
                                     color = Color.White,
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
@@ -459,7 +461,7 @@ fun SelectedDayDetailCard(
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.North,
-                                    contentDescription = "Maksimum",
+                                    contentDescription = stringResource(R.string.max_temp),
                                     tint = Color(0xFFEF5350),
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -468,7 +470,7 @@ fun SelectedDayDetailCard(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Maksimum",
+                                text = stringResource(R.string.max_temp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -501,7 +503,7 @@ fun SelectedDayDetailCard(
                             Box(contentAlignment = Alignment.Center) {
                                 Icon(
                                     imageVector = Icons.Default.South,
-                                    contentDescription = "Minimum",
+                                    contentDescription = stringResource(R.string.min_temp),
                                     tint = Color(0xFF42A5F5),
                                     modifier = Modifier.size(16.dp)
                                 )
@@ -510,7 +512,7 @@ fun SelectedDayDetailCard(
                         Spacer(modifier = Modifier.width(10.dp))
                         Column {
                             Text(
-                                text = "Minimum",
+                                text = stringResource(R.string.min_temp),
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -587,7 +589,7 @@ fun SelectableDayCard(
                     modifier = Modifier.padding(end = 8.dp)
                 ) {
                     Text(
-                        text = "Hari Ini",
+                        text = stringResource(R.string.today),
                         style = MaterialTheme.typography.labelSmall.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 10.sp

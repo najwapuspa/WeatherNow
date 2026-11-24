@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Cloud
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Thermostat
@@ -45,10 +46,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.weathernow.R
+import com.example.weathernow.data.model.AppLanguage
 import com.example.weathernow.data.model.TemperatureUnit
 import com.example.weathernow.data.model.ThemeMode
 import com.example.weathernow.viewmodel.WeatherViewModel
@@ -60,6 +64,7 @@ fun SettingsScreen(
 ) {
     val themeMode by viewModel.themeMode.collectAsStateWithLifecycle()
     val temperatureUnit by viewModel.temperatureUnit.collectAsStateWithLifecycle()
+    val appLanguage by viewModel.appLanguage.collectAsStateWithLifecycle()
 
     Column(
         modifier = modifier
@@ -79,7 +84,7 @@ fun SettingsScreen(
             // 1. Tampilan Tema Section
             SettingsSectionHeader(
                 icon = Icons.Default.Palette,
-                title = "Tampilan Tema"
+                title = stringResource(R.string.section_theme)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -94,7 +99,7 @@ fun SettingsScreen(
             // 2. Pengaturan Satuan Suhu Section
             SettingsSectionHeader(
                 icon = Icons.Default.Thermostat,
-                title = "Satuan Suhu"
+                title = stringResource(R.string.section_unit)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -106,10 +111,25 @@ fun SettingsScreen(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // 3. Informasi Aplikasi Section
+            // 3. Bahasa Aplikasi Section
+            SettingsSectionHeader(
+                icon = Icons.Default.Language,
+                title = stringResource(R.string.section_language)
+            )
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            LanguageSelectionCard(
+                currentLanguage = appLanguage,
+                onSelectLanguage = { viewModel.setLanguage(it) }
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // 4. Informasi Aplikasi Section
             SettingsSectionHeader(
                 icon = Icons.Default.Info,
-                title = "Informasi Aplikasi"
+                title = stringResource(R.string.section_app_info)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -131,7 +151,7 @@ fun SettingsTopBar(modifier: Modifier = Modifier) {
     ) {
         Column {
             Text(
-                text = "Pengaturan",
+                text = stringResource(R.string.settings_title),
                 style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 22.sp
@@ -139,7 +159,7 @@ fun SettingsTopBar(modifier: Modifier = Modifier) {
                 color = MaterialTheme.colorScheme.onBackground
             )
             Text(
-                text = "Sesuaikan tampilan dan preferensi aplikasi",
+                text = stringResource(R.string.settings_subtitle),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -195,8 +215,8 @@ fun ThemeSelectionCard(
     ) {
         Column(modifier = Modifier.padding(14.dp)) {
             ThemeOptionItem(
-                title = "Light Mode",
-                subtitle = "Tampilan terang dan bersih",
+                title = stringResource(R.string.theme_light),
+                subtitle = stringResource(R.string.theme_light_desc),
                 icon = Icons.Default.LightMode,
                 isSelected = currentTheme == ThemeMode.LIGHT,
                 onClick = { onSelectTheme(ThemeMode.LIGHT) }
@@ -208,8 +228,8 @@ fun ThemeSelectionCard(
             )
 
             ThemeOptionItem(
-                title = "Dark Mode",
-                subtitle = "Tampilan navy gelap yang nyaman di mata",
+                title = stringResource(R.string.theme_dark),
+                subtitle = stringResource(R.string.theme_dark_desc),
                 icon = Icons.Default.DarkMode,
                 isSelected = currentTheme == ThemeMode.DARK,
                 onClick = { onSelectTheme(ThemeMode.DARK) }
@@ -221,8 +241,8 @@ fun ThemeSelectionCard(
             )
 
             ThemeOptionItem(
-                title = "System Default",
-                subtitle = "Mengikuti pengaturan tema sistem Android",
+                title = stringResource(R.string.theme_system),
+                subtitle = stringResource(R.string.theme_system_desc),
                 icon = Icons.Default.BrightnessAuto,
                 isSelected = currentTheme == ThemeMode.SYSTEM,
                 onClick = { onSelectTheme(ThemeMode.SYSTEM) }
@@ -255,6 +275,101 @@ fun ThemeOptionItem(
             Box(contentAlignment = Alignment.Center) {
                 Icon(
                     imageVector = icon,
+                    contentDescription = null,
+                    tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.width(14.dp))
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold
+                ),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.labelSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        RadioButton(
+            selected = isSelected,
+            onClick = onClick,
+            colors = RadioButtonDefaults.colors(
+                selectedColor = MaterialTheme.colorScheme.primary,
+                unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        )
+    }
+}
+
+@Composable
+fun LanguageSelectionCard(
+    currentLanguage: AppLanguage,
+    onSelectLanguage: (AppLanguage) -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .shadow(elevation = 3.dp, shape = RoundedCornerShape(20.dp)),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(modifier = Modifier.padding(14.dp)) {
+            LanguageOptionItem(
+                title = stringResource(R.string.lang_indonesian),
+                subtitle = stringResource(R.string.lang_indonesian_desc),
+                isSelected = currentLanguage == AppLanguage.INDONESIAN,
+                onClick = { onSelectLanguage(AppLanguage.INDONESIAN) }
+            )
+
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                modifier = Modifier.padding(vertical = 8.dp)
+            )
+
+            LanguageOptionItem(
+                title = stringResource(R.string.lang_english),
+                subtitle = stringResource(R.string.lang_english_desc),
+                isSelected = currentLanguage == AppLanguage.ENGLISH,
+                onClick = { onSelectLanguage(AppLanguage.ENGLISH) }
+            )
+        }
+    }
+}
+
+@Composable
+fun LanguageOptionItem(
+    title: String,
+    subtitle: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Surface(
+            color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.background,
+            shape = CircleShape,
+            modifier = Modifier.size(38.dp)
+        ) {
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    imageVector = Icons.Default.Language,
                     contentDescription = null,
                     tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.size(20.dp)
@@ -406,12 +521,12 @@ fun AppInfoCard() {
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "WeatherNow",
+                        text = stringResource(R.string.app_name),
                         style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Versi 1.0 (Build PJBL)",
+                        text = stringResource(R.string.app_version),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -421,7 +536,7 @@ fun AppInfoCard() {
             Spacer(modifier = Modifier.height(14.dp))
 
             Text(
-                text = "Aplikasi prakiraan cuaca modern multi-page berbasis Jetpack Compose dan Material 3 dengan integrasi API real-time Open-Meteo.",
+                text = stringResource(R.string.app_description),
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 lineHeight = 18.sp
@@ -443,12 +558,12 @@ fun AppInfoCard() {
                 Spacer(modifier = Modifier.width(8.dp))
                 Column {
                     Text(
-                        text = "Sumber Data: Open-Meteo API",
+                        text = stringResource(R.string.data_source_title),
                         style = MaterialTheme.typography.labelMedium.copy(fontWeight = FontWeight.SemiBold),
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "Prakiraan akurat tanpa API key (Lisensi Non-Komersial)",
+                        text = stringResource(R.string.data_source_desc),
                         style = MaterialTheme.typography.labelSmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -467,7 +582,7 @@ fun AppInfoCard() {
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Aplikasi membutuhkan koneksi internet untuk memperbarui data cuaca.",
+                    text = stringResource(R.string.internet_note),
                     style = MaterialTheme.typography.labelSmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
