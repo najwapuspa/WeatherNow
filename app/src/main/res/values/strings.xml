@@ -64,11 +64,14 @@
     <string name="lang_english">English</string>
     <string name="lang_english_desc">English Language</string>
 
-    <string name="app_version">Version 1.0 (Build PJBL)</string>
-    <string name="app_description">Modern multi-page weather forecast app built with Jetpack Compose and Material 3 integrated with real-time Open-Meteo API.</string>
-    <string name="data_source_title">Data Source: Open-Meteo API</string>
-    <string name="data_source_desc">Accurate forecast without API key (Non-Commercial License)</string>
-    <string name="internet_note">App requires internet connection to update weather data.</string>
+    <string name="app_version">Version 1.0.0</string>
+    <string name="app_description">WeatherNow helps you monitor current weather conditions and get weather forecasts easily.</string>
+    <string name="info_developer_label">Developer</string>
+    <string name="info_developer_value">WeatherNow Team</string>
+    <string name="info_source_label">Weather Data Source</string>
+    <string name="info_source_value">Open-Meteo</string>
+    <string name="info_category_label">Category</string>
+    <string name="info_category_value">Weather &amp; Forecast</string>
 
     <!-- Loading & Error -->
     <string name="loading_message">Loading weather data...</string>
