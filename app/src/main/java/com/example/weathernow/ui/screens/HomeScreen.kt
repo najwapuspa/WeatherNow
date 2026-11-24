@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -70,13 +69,13 @@ fun HomeScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         HomeTopBar(
-            onRefresh = { viewModel.refreshWeather() },
-            modifier = Modifier.statusBarsPadding()
+            onRefresh = { viewModel.refreshWeather() }
         )
 
         Column(
             modifier = Modifier
-                .fillMaxSize()
+                .weight(1f)
+                .fillMaxWidth()
                 .padding(horizontal = 20.dp)
                 .verticalScroll(rememberScrollState())
         ) {

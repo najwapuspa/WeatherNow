@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -75,14 +74,15 @@ fun ForecastScreen(
             .background(MaterialTheme.colorScheme.background)
     ) {
         ForecastTopBar(
-            cityName = (uiState as? WeatherUiState.Success)?.data?.city?.name ?: "WeatherNow",
-            modifier = Modifier.statusBarsPadding()
+            cityName = (uiState as? WeatherUiState.Success)?.data?.city?.name ?: "WeatherNow"
         )
 
         when (val state = uiState) {
             is WeatherUiState.Loading -> {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
                     WeatherLoadingView(message = state.message)
@@ -92,7 +92,8 @@ fun ForecastScreen(
             is WeatherUiState.Error -> {
                 Box(
                     modifier = Modifier
-                        .fillMaxSize()
+                        .weight(1f)
+                        .fillMaxWidth()
                         .padding(20.dp),
                     contentAlignment = Alignment.Center
                 ) {
@@ -110,7 +111,9 @@ fun ForecastScreen(
                     temperatureUnit = temperatureUnit,
                     selectedDayIndex = selectedDayIndex,
                     onSelectDay = { viewModel.selectForecastDay(it) },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
                 )
             }
         }

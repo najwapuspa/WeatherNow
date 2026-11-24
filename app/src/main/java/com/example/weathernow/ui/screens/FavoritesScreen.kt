@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -71,19 +70,21 @@ fun FavoritesScreen(
     ) {
         FavoritesTopBar(
             onBackToHome = onNavigateToHome,
-            count = favoriteCities.size,
-            modifier = Modifier.statusBarsPadding()
+            count = favoriteCities.size
         )
 
         if (favoriteCities.isEmpty()) {
             EmptyFavoritesView(
                 onGoToHome = onNavigateToHome,
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
             )
         } else {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .weight(1f)
+                    .fillMaxWidth()
                     .padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
