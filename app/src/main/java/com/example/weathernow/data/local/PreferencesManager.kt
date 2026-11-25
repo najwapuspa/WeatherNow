@@ -109,14 +109,19 @@ class PreferencesManager(private val context: Context) {
         }
     }
 
-    suspend fun removeFavoriteCity(cityId: Long) {
+    suspend fun removeFavoriteCity(cityId: Long, cityName: String? = null, country: String? = null) {
         context.dataStore.edit { preferences ->
             val json = preferences[KEY_FAVORITE_CITIES]
             if (!json.isNullOrBlank()) {
                 try {
                     val type = object : TypeToken<List<CityLocation>>() {}.type
                     val currentList = gson.fromJson<List<CityLocation>>(json, type)?.toMutableList() ?: mutableListOf()
-                    val filtered = currentList.filter { it.id != cityId }
+                    val filtered = currentList.filter { city ->
+                        val matchId = cityId != 0L && city.id == cityId
+                        val matchName = cityName != null && city.name.equals(cityName, ignoreCase = true) &&
+                                (country == null || city.country.equals(country, ignoreCase = true))
+                        !(matchId || matchName)
+                    }
                     preferences[KEY_FAVORITE_CITIES] = gson.toJson(filtered)
                 } catch (_: Exception) {
                     // Ignored

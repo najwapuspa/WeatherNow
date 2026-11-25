@@ -11,6 +11,10 @@ import com.example.weathernow.data.model.TemperatureUnit
 import com.example.weathernow.data.model.ThemeMode
 import com.example.weathernow.data.model.WeatherDashboardData
 import com.example.weathernow.data.repository.WeatherRepository
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -79,6 +83,7 @@ class WeatherViewModel @JvmOverloads constructor(
     private var currentCity: CityLocation = WeatherRepository.DEFAULT_CITY
     private var favoriteCitiesList: List<CityLocation> = emptyList()
     private var currentLanguage: AppLanguage = AppLanguage.INDONESIAN
+    private var favoriteWeatherJob: Job? = null
 
     init {
         // Observe language changes
@@ -98,7 +103,7 @@ class WeatherViewModel @JvmOverloads constructor(
                 updateFavoriteWeatherList(cities)
                 val current = _uiState.value
                 if (current is WeatherUiState.Success) {
-                    val isFav = cities.any { it.id == current.data.city.id }
+                    val isFav = cities.any { it.id == current.data.city.id || it.name.equals(current.data.city.name, ignoreCase = true) }
                     if (current.data.isFavorite != isFav) {
                         _uiState.value = WeatherUiState.Success(current.data.copy(isFavorite = isFav))
                     }
@@ -120,11 +125,12 @@ class WeatherViewModel @JvmOverloads constructor(
             }
             _uiState.value = WeatherUiState.Loading(loadingMsg)
 
-            val isFav = favoriteCitiesList.any { it.id == city.id }
+            val isFav = favoriteCitiesList.any { it.id == city.id || it.name.equals(city.name, ignoreCase = true) }
             val result = repository.getWeather(city, isFavorite = isFav, language = currentLanguage)
             result.fold(
                 onSuccess = { data ->
-                    _uiState.value = WeatherUiState.Success(data)
+                    val isFavNow = favoriteCitiesList.any { it.id == city.id || it.name.equals(city.name, ignoreCase = true) }
+                    _uiState.value = WeatherUiState.Success(data.copy(isFavorite = isFavNow))
                 },
                 onFailure = { error ->
                     _uiState.value = WeatherUiState.Error(
@@ -227,50 +233,93 @@ class WeatherViewModel @JvmOverloads constructor(
     // --- Favorites Logic ---
     fun toggleFavorite(city: CityLocation) {
         viewModelScope.launch {
-            val isFav = favoriteCitiesList.any { it.id == city.id }
+            val isFav = favoriteCitiesList.any { it.id == city.id || it.name.equals(city.name, ignoreCase = true) }
             if (isFav) {
-                preferencesManager.removeFavoriteCity(city.id)
+                removeFavorite(city)
             } else {
                 preferencesManager.addFavoriteCity(city)
             }
         }
     }
 
-    fun removeFavorite(cityId: Long) {
+    fun removeFavorite(city: CityLocation) {
+        removeFavorite(city.id, city.name, city.country)
+    }
+
+    fun removeFavorite(cityId: Long, cityName: String? = null, country: String? = null) {
+        // 1. Immediately update in-memory StateFlow so UI updates instantly
+        _favoriteCitiesWeather.value = _favoriteCitiesWeather.value.filter { item ->
+            val matchId = cityId != 0L && item.city.id == cityId
+            val matchName = cityName != null && item.city.name.equals(cityName, ignoreCase = true) &&
+                    (country == null || item.city.country.equals(country, ignoreCase = true))
+            !(matchId || matchName)
+        }
+        favoriteCitiesList = favoriteCitiesList.filter { city ->
+            val matchId = cityId != 0L && city.id == cityId
+            val matchName = cityName != null && city.name.equals(cityName, ignoreCase = true) &&
+                    (country == null || city.country.equals(country, ignoreCase = true))
+            !(matchId || matchName)
+        }
+
+        // 2. Update current weather data isFavorite flag if matching
+        val current = _uiState.value
+        if (current is WeatherUiState.Success) {
+            val isCurrentCity = (cityId != 0L && current.data.city.id == cityId) ||
+                    (cityName != null && current.data.city.name.equals(cityName, ignoreCase = true))
+            if (isCurrentCity) {
+                _uiState.value = WeatherUiState.Success(current.data.copy(isFavorite = false))
+            }
+        }
+
+        // 3. Persist deletion to DataStore
         viewModelScope.launch {
-            preferencesManager.removeFavoriteCity(cityId)
+            preferencesManager.removeFavoriteCity(cityId, cityName, country)
         }
     }
 
     private fun updateFavoriteWeatherList(cities: List<CityLocation>) {
-        viewModelScope.launch {
-            val items = cities.map { city ->
-                FavoriteCityWeather(
+        favoriteWeatherJob?.cancel()
+        favoriteWeatherJob = viewModelScope.launch {
+            val currentMap = _favoriteCitiesWeather.value.associateBy { it.city.id }
+
+            // Fast in-memory state: preserve already loaded weather, mark new ones as loading
+            val initialItems = cities.map { city ->
+                currentMap[city.id] ?: FavoriteCityWeather(
                     city = city,
                     isLoading = true
                 )
             }
-            _favoriteCitiesWeather.value = items
+            _favoriteCitiesWeather.value = initialItems
 
-            val updatedItems = cities.map { city ->
-                val weatherResult = repository.getWeather(city, language = currentLanguage)
-                weatherResult.fold(
-                    onSuccess = { data ->
-                        FavoriteCityWeather(
-                            city = city,
-                            currentTemp = data.current.temperature,
-                            weatherCode = data.current.weatherCode,
-                            conditionDescription = data.current.conditionDescription,
-                            isLoading = false
-                        )
-                    },
-                    onFailure = {
-                        FavoriteCityWeather(
-                            city = city,
-                            isLoading = false
-                        )
+            // Concurrently fetch weather for any city that is missing weather data
+            val updatedItems = coroutineScope {
+                cities.map { city ->
+                    async {
+                        val existing = currentMap[city.id]
+                        if (existing != null && existing.currentTemp != null && !existing.isLoading) {
+                            existing
+                        } else {
+                            val weatherResult = repository.getWeather(city, language = currentLanguage)
+                            weatherResult.fold(
+                                onSuccess = { data ->
+                                    FavoriteCityWeather(
+                                        city = city,
+                                        currentTemp = data.current.temperature,
+                                        weatherCode = data.current.weatherCode,
+                                        conditionDescription = data.current.conditionDescription,
+                                        isLoading = false
+                                    )
+                                },
+                                onFailure = {
+                                    FavoriteCityWeather(
+                                        city = city,
+                                        isLoading = false
+                                    )
+                                }
+                            )
+                        }
                     }
-                )
+                }.awaitAll()
             }
             _favoriteCitiesWeather.value = updatedItems
         }

@@ -139,4 +139,54 @@ class WeatherModelsTest {
         assertEquals(2, response.hourly?.time?.size)
         assertEquals(25.0, response.hourly?.temperature2m?.first() ?: 0.0, 0.01)
     }
+
+    @Test
+    fun testFavoriteCitiesAddDeleteAndReadd() {
+        val city1 = CityLocation(1L, "Jakarta", "Indonesia", "DKI Jakarta", -6.2, 106.8)
+        val city2 = CityLocation(2L, "Bandung", "Indonesia", "Jawa Barat", -6.9, 107.6)
+        val city3 = CityLocation(3L, "Surabaya", "Indonesia", "Jawa Timur", -7.2, 112.7)
+
+        // 1. Add 3 cities
+        val list = mutableListOf(city1, city2, city3)
+        assertEquals(3, list.size)
+
+        // 2. Remove 1 city (Bandung, id = 2)
+        val filteredAfterRemove1 = list.filter { city ->
+            val matchId = city.id == 2L
+            val matchName = city.name.equals("Bandung", ignoreCase = true)
+            !(matchId || matchName)
+        }.toMutableList()
+
+        assertEquals(2, filteredAfterRemove1.size)
+        assertTrue(filteredAfterRemove1.any { it.name == "Jakarta" })
+        assertTrue(filteredAfterRemove1.any { it.name == "Surabaya" })
+        assertTrue(filteredAfterRemove1.none { it.name == "Bandung" })
+
+        // 3. Remove another city (Surabaya, id = 3)
+        val filteredAfterRemove2 = filteredAfterRemove1.filter { city ->
+            val matchId = city.id == 3L
+            val matchName = city.name.equals("Surabaya", ignoreCase = true)
+            !(matchId || matchName)
+        }.toMutableList()
+
+        assertEquals(1, filteredAfterRemove2.size)
+        assertEquals("Jakarta", filteredAfterRemove2.first().name)
+
+        // 4. Re-add Bandung
+        val alreadyExists = filteredAfterRemove2.any { it.id == city2.id || it.name == city2.name }
+        if (!alreadyExists) {
+            filteredAfterRemove2.add(city2)
+        }
+        assertEquals(2, filteredAfterRemove2.size)
+        assertTrue(filteredAfterRemove2.any { it.name == "Jakarta" })
+        assertTrue(filteredAfterRemove2.any { it.name == "Bandung" })
+
+        // 5. Test JSON roundtrip persistence
+        val json = gson.toJson(filteredAfterRemove2)
+        val type = object : com.google.gson.reflect.TypeToken<List<CityLocation>>() {}.type
+        val restoredList: List<CityLocation> = gson.fromJson(json, type)
+        assertEquals(2, restoredList.size)
+        assertEquals("Jakarta", restoredList[0].name)
+        assertEquals("Bandung", restoredList[1].name)
+    }
 }

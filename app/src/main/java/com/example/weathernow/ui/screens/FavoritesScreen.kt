@@ -107,7 +107,7 @@ fun FavoritesScreen(
                             onNavigateToHome()
                         },
                         onDelete = {
-                            viewModel.removeFavorite(item.city.id)
+                            viewModel.removeFavorite(item.city)
                         }
                     )
                 }
@@ -190,8 +190,7 @@ fun FavoriteCityCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .shadow(elevation = 3.dp, shape = RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick),
+            .shadow(elevation = 3.dp, shape = RoundedCornerShape(20.dp)),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
@@ -203,74 +202,83 @@ fun FavoriteCityCard(
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icon
-            Box(
+            // Clickable content area (Icon, City Info, Temperature)
+            Row(
                 modifier = Modifier
-                    .size(46.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primaryContainer),
-                contentAlignment = Alignment.Center
+                    .weight(1f)
+                    .clip(RoundedCornerShape(12.dp))
+                    .clickable(onClick = onClick),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                if (item.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(20.dp),
-                        strokeWidth = 2.dp,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                } else if (weatherIcon != null) {
-                    Icon(
-                        imageVector = weatherIcon,
-                        contentDescription = item.conditionDescription,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(26.dp)
-                    )
-                } else {
-                    Icon(
-                        imageVector = Icons.Default.LocationCity,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
-                    )
+                // Icon
+                Box(
+                    modifier = Modifier
+                        .size(46.dp)
+                        .clip(CircleShape)
+                        .background(MaterialTheme.colorScheme.primaryContainer),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (item.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    } else if (weatherIcon != null) {
+                        Icon(
+                            imageVector = weatherIcon,
+                            contentDescription = item.conditionDescription,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(26.dp)
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.LocationCity,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
                 }
-            }
 
-            Spacer(modifier = Modifier.width(14.dp))
+                Spacer(modifier = Modifier.width(14.dp))
 
-            // City & Condition
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = item.city.name,
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Text(
-                    text = item.city.displaySubtitle.ifEmpty { item.city.country },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                if (item.conditionDescription != null) {
-                    Spacer(modifier = Modifier.height(2.dp))
+                // City & Condition
+                Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = item.conditionDescription,
-                        style = MaterialTheme.typography.labelSmall,
-                        color = MaterialTheme.colorScheme.primary
+                        text = item.city.name,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 18.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Text(
+                        text = item.city.displaySubtitle.ifEmpty { item.city.country },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    if (item.conditionDescription != null) {
+                        Spacer(modifier = Modifier.height(2.dp))
+                        Text(
+                            text = item.conditionDescription,
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+
+                // Temperature
+                if (displayTemp != null) {
+                    Text(
+                        text = "$displayTemp${temperatureUnit.symbol}",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 24.sp
+                        ),
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-            }
-
-            // Temperature
-            if (displayTemp != null) {
-                Text(
-                    text = "$displayTemp${temperatureUnit.symbol}",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp
-                    ),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
             }
 
             Spacer(modifier = Modifier.width(8.dp))
